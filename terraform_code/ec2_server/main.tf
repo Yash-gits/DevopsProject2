@@ -7,14 +7,15 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = var.region_name
+data "aws_vpc" "default" {
+  default = true
 }
 
 # STEP1: CREATE SG
 resource "aws_security_group" "my-sg" {
   name        = "JENKINS-SERVER-SG"
   description = "Jenkins Server Ports"
+  
   
   # Port 22 is required for SSH Access
   ingress {
@@ -153,7 +154,7 @@ resource "aws_instance" "my-ec2" {
     # ESTABLISHING SSH CONNECTION WITH EC2
     connection {
       type        = "ssh"
-      private_key = file("./key.pem") # replace with your key-name 
+      private_key = file("./invalidUSER.pem") # replace with your key-name 
       user        = "ubuntu"
       host        = self.public_ip
     }

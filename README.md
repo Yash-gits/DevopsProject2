@@ -30,7 +30,7 @@ This project demonstrates deploying an Amazon Prime clone using a set of DevOps 
 ## Infrastructure Setup Using Terraform
 1. **Clone the Repository** (Open Command Prompt & run below):
    ```bash
-   git clone https://github.com/pandacloud1/DevopsProject2.git
+   git clone https://github.com/Yash-gits/DevopsProject2.git
    cd DevopsProject2
    code .   # this command will open VS code in backend
    ```
@@ -104,7 +104,7 @@ pipeline {
     stages {
         stage('1. Git Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/pandacloud1/DevopsProject2.git'
+                git branch: 'main', url: 'https://github.com/Yash-gits/DevopsProject2.git'
             }
         }
         
@@ -152,8 +152,8 @@ pipeline {
                     sh """
                     aws configure set aws_access_key_id $AWS_ACCESS_KEY
                     aws configure set aws_secret_access_key $AWS_SECRET_KEY
-                    aws ecr describe-repositories --repository-names ${params.ECR_REPO_NAME} --region us-east-1 || \
-                    aws ecr create-repository --repository-name ${params.ECR_REPO_NAME} --region us-east-1
+                    aws ecr describe-repositories --repository-names ${params.ECR_REPO_NAME} --region ap-south-1 || \
+                    aws ecr create-repository --repository-name ${params.ECR_REPO_NAME} --region ap-south-1
                     """
                 }
             }
@@ -164,9 +164,9 @@ pipeline {
                 withCredentials([string(credentialsId: 'access-key', variable: 'AWS_ACCESS_KEY'), 
                                  string(credentialsId: 'secret-key', variable: 'AWS_SECRET_KEY')]) {
                     sh """
-                    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${params.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com
-                    docker tag ${params.ECR_REPO_NAME} ${params.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${params.ECR_REPO_NAME}:${BUILD_NUMBER}
-                    docker tag ${params.ECR_REPO_NAME} ${params.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${params.ECR_REPO_NAME}:latest
+                    aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${params.AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com
+                    docker tag ${params.ECR_REPO_NAME} ${params.AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com/${params.ECR_REPO_NAME}:${BUILD_NUMBER}
+                    docker tag ${params.ECR_REPO_NAME} ${params.AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com/${params.ECR_REPO_NAME}:latest
                     """
                 }
             }
@@ -177,8 +177,8 @@ pipeline {
                 withCredentials([string(credentialsId: 'access-key', variable: 'AWS_ACCESS_KEY'), 
                                  string(credentialsId: 'secret-key', variable: 'AWS_SECRET_KEY')]) {
                     sh """
-                    docker push ${params.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${params.ECR_REPO_NAME}:${BUILD_NUMBER}
-                    docker push ${params.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${params.ECR_REPO_NAME}:latest
+                    docker push ${params.AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com/${params.ECR_REPO_NAME}:${BUILD_NUMBER}
+                    docker push ${params.AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com/${params.ECR_REPO_NAME}:latest
                     """
                 }
             }
@@ -187,8 +187,8 @@ pipeline {
         stage('10. Cleanup Images') {
             steps {
                 sh """
-                docker rmi ${params.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${params.ECR_REPO_NAME}:${BUILD_NUMBER}
-                docker rmi ${params.AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${params.ECR_REPO_NAME}:latest
+                docker rmi ${params.AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com/${params.ECR_REPO_NAME}:${BUILD_NUMBER}
+                docker rmi ${params.AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com/${params.ECR_REPO_NAME}:latest
 		docker images
                 """
             }
@@ -221,7 +221,7 @@ pipeline {
                 script {
                     withCredentials([string(credentialsId: 'access-key', variable: 'AWS_ACCESS_KEY'),
                                      string(credentialsId: 'secret-key', variable: 'AWS_SECRET_KEY')]) {
-                        sh "aws eks --region us-east-1 update-kubeconfig --name ${params.CLUSTER_NAME}"
+                        sh "aws eks --region ap-south-1 update-kubeconfig --name ${params.CLUSTER_NAME}"
                     }
                 }
             }
@@ -290,7 +290,7 @@ pipeline {
                 script {
                     withCredentials([string(credentialsId: 'access-key', variable: 'AWS_ACCESS_KEY'),
                                      string(credentialsId: 'secret-key', variable: 'AWS_SECRET_KEY')]) {
-                        sh "aws eks --region us-east-1 update-kubeconfig --name ${params.CLUSTER_NAME}"
+                        sh "aws eks --region ap-south-1 update-kubeconfig --name ${params.CLUSTER_NAME}"
                     }
                 }
             }
@@ -327,14 +327,14 @@ pipeline {
                 script {
                     // Step 1: Delete ECR Repository
                     sh '''
-                    aws ecr delete-repository --repository-name amazon-prime --region us-east-1 --force
+                    aws ecr delete-repository --repository-name amazon-prime --region ap-south-1 --force
                     '''
 
                     // Step 2: Delete KMS Keys
                     sh '''
-                    for key in $(aws kms list-keys --region us-east-1 --query "Keys[*].KeyId" --output text); do
-                        aws kms disable-key --key-id $key --region us-east-1
-                        aws kms schedule-key-deletion --key-id $key --pending-window-in-days 7 --region us-east-1
+                    for key in $(aws kms list-keys --region ap-south-1 --query "Keys[*].KeyId" --output text); do
+                        aws kms disable-key --key-id $key --region ap-south-1
+                        aws kms schedule-key-deletion --key-id $key --pending-window-in-days 7 --region ap-south-1
                     done
                     '''
                 }

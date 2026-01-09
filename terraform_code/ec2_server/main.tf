@@ -7,10 +7,6 @@ terraform {
   }
 }
 
-data "aws_vpc" "default" {
-  default = true
-}
-
 # STEP1: CREATE SG
 resource "aws_security_group" "my-sg" {
   name        = "JENKINS-SERVER-SG"
